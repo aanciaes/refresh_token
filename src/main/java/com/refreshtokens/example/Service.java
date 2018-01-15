@@ -5,20 +5,19 @@ import com.spotify.apollo.Response;
 
 public class Service {
 
-    static Response<String> login (RequestContext requestContext) {
-        String s = "";
+    static Response<ResponseEntity> login (RequestContext requestContext) {
+        System.out.println("Payload: " + requestContext.request().payload().get().utf8());
         String username = requestContext.request().parameter("username").get();
         String password = requestContext.request().parameter("password").get();
 
         if(username.equals("miguel") && password.equals("password")){
-            s = "Login Successful";
-            return Response.forPayload(s)
-                    .withHeader("Authorization", "Bearer: " + JwtService.issueJwt(username));
+            return Response.forPayload(new ResponseEntity("Login Successful", 200))
+                    .withHeader("Authorization", "Bearer " + JwtService.issueJwt(username))
+                    .withHeader("Set-Cookie", "refresh-token=" + JwtService.issueRefreshToken(username)
+                    + "; HttpOnly");
         }
         else {
-            s = "Login Failed";
-            return Response.forPayload(s)
-                    .withHeader("RefreshToken", String.valueOf(s.length()));
+            return Response.forPayload(new ResponseEntity("Login Failed", 401));
         }
     }
 

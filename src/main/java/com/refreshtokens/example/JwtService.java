@@ -3,6 +3,7 @@ package com.refreshtokens.example;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.ExpiredJwtException;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -13,14 +14,14 @@ public class JwtService {
     private static final String refreshToken_key = "ev3nMoreS3cureK3yThanTheOtherOne!";
 
     static String issueJwt (String username) {
-        //TODO: expiration date
         String compactJws = Jwts.builder()
                 .setSubject(username)
                 .claim("refresh_token", false)
                 .claim("claimExample", "hello")
+                .setExpiration(setExpirationDate(false))
+                .setIssuer("Refresh Token example authentication server")
                 .signWith(SignatureAlgorithm.HS256, key)
                 .compact();
-
 
         return compactJws;
     }
@@ -38,22 +39,38 @@ public class JwtService {
                 .claim("refresh_token", true)
                 .claim("admin", true)
                 .setIssuedAt(current)
-                .setExpiration(expirationDate)
+                .setExpiration(setExpirationDate(true))
                 .setIssuer("Refresh Token example authentication server")
-                .signWith(SignatureAlgorithm.HS512, key)
+                .signWith(SignatureAlgorithm.HS512, refreshToken_key)
                 .compact();
         return compactJws;
     }
 
     static boolean verifyJwt (String jwt) {
-        //TODO: Verify expiration date
         try {
-            Jwts.parser().setSigningKey(key).parseClaimsJws(jwt);
+            Jwts.parser().setSigningKey(key)
+                    .requireIssuer("Refresh Token example authentication server")
+                    .parseClaimsJws(jwt);
             return true;
 
+        }catch (ExpiredJwtException e){
+            System.out.println("JWT has expired");
+            return false;
         } catch (SignatureException e) {
-
+            System.out.println("Signature Exception");
             return false;
         }
+    }
+
+    private static Date setExpirationDate (boolean refreshToken) {
+        Date current = new Date();
+        Calendar c = Calendar.getInstance();
+        c.setTime(current);
+        if(refreshToken) {
+            c.add(Calendar.WEEK_OF_MONTH, 1);
+        }else{
+            c.add(Calendar.SECOND, 60);
+        }
+        return c.getTime();
     }
 }
