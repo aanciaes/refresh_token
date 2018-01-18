@@ -1,9 +1,6 @@
 package example.refreshtokens.auth;
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.SignatureException;
-import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.*;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -44,6 +41,23 @@ public class JwtService {
                 .signWith(SignatureAlgorithm.HS512, refreshToken_key)
                 .compact();
         return compactJws;
+    }
+
+    public static boolean verifyRefreshToken (String refreshToken) {
+        try {
+            Jwts.parser().setSigningKey(refreshToken_key)
+                    .require("refresh_token", true)
+                    .requireIssuer("Refresh Token example authentication server")
+                    .parseClaimsJws(refreshToken);
+            return true;
+
+        }catch (ExpiredJwtException e){
+            System.out.println("JWT has expired");
+            return false;
+        } catch (SignatureException e) {
+            System.out.println("Signature Exception");
+            return false;
+        }
     }
 
     public static boolean verifyJwt (String jwt) {

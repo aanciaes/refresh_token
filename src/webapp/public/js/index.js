@@ -1,9 +1,9 @@
 $(document).ready(function () {
 
-    var x = 2;
+    var x = 0;
     if(x===2){
         alert("x=2");
-        window.location.href = "test.html";
+        window.location.href = "dashboard.html";
     }else{
         alert("x!=2");
     }
@@ -15,15 +15,9 @@ $(document).ready(function () {
         ajaxRequest("POST", "http://localhost:1234/login?username=" + $("#username").val() + "&password=" + $("#password").val()
             , function (data) {
                 alert(data)
-                window.location.href="test.html";
+                window.location.href="dashboard.html";
             }, true);
 
-    });
-
-    $("#second_request").click(function () {
-        ajaxRequest("POST", "http://localhost:1234/verify", function (data) {
-            alert(data)
-        }, true);
     });
 });
 

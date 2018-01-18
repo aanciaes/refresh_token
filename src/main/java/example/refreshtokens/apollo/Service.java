@@ -26,10 +26,10 @@ public class Service {
         }
     }
 
-    static Response<ResponseEntity> verify (RequestContext request) {
+    static Response<ResponseEntity> verifyRefreshToken (RequestContext request) {
         try {
-            String bearer = request.request().header("access_token").get();
-            boolean isValid = JwtService.verifyJwt(bearer);
+            String refreshToken = getRefreshTokenFromCookies(request.request().header("cookie").get());
+            boolean isValid = JwtService.verifyRefreshToken(refreshToken);
 
             return Response.forPayload(new ResponseEntity("Token is valid: " + isValid,
                     isValid ? 200 : 401))
@@ -40,5 +40,16 @@ public class Service {
                     .withHeader("Access-Control-Allow-Origin", "http://localhost:63342")
                     .withHeader("Access-Control-Allow-Credentials", "true");
         }
+    }
+
+    private static String getRefreshTokenFromCookies (String allCookies) {
+        String [] splited = allCookies.split("\\s|=|;");
+
+        for (int i=0; i<splited.length; i++) {
+            if (splited[i].equals("refresh-token")) {
+                return splited[i + 1];
+            }
+        }
+        return new String ();
     }
 }

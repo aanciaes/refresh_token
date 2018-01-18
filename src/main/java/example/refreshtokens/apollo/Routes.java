@@ -12,7 +12,7 @@ public class Routes implements RouteProvider {
     public Stream<? extends Route<? extends AsyncHandler<?>>> routes() {
         return Stream.of(
                 Route.sync("POST", "/login", Service::login),
-                Route.sync("POST", "/verify", Service::verify)
+                Route.sync("POST", "/verify", Service::verifyRefreshToken)
         );
     }
 }
