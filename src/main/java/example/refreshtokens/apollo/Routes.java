@@ -1,4 +1,4 @@
-package com.refreshtokens.example;
+package example.refreshtokens.apollo;
 
 import com.spotify.apollo.route.AsyncHandler;
 import com.spotify.apollo.route.Route;

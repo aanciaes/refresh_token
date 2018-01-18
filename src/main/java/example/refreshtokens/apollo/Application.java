@@ -1,10 +1,8 @@
-package com.refreshtokens.example;
+package example.refreshtokens.apollo;
 
 import com.spotify.apollo.Environment;
-import com.spotify.apollo.RequestContext;
 import com.spotify.apollo.httpservice.HttpService;
 import com.spotify.apollo.httpservice.LoadingException;
-import com.spotify.apollo.route.Route;
 
 public class Application {
 

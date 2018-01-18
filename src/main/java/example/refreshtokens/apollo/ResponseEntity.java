@@ -1,4 +1,4 @@
-package com.refreshtokens.example;
+package example.refreshtokens.apollo;
 
 public class ResponseEntity {
 

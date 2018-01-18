@@ -1,4 +1,4 @@
-package example.refreshtokens.apollo;
+package example.refreshtokens.auth;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
