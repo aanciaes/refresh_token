@@ -1,4 +1,4 @@
-package com.refreshtokens.example;
+package example.refreshtokens.apollo;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -13,7 +13,7 @@ public class JwtService {
     private static final String key = "supersecurekey";
     private static final String refreshToken_key = "ev3nMoreS3cureK3yThanTheOtherOne!";
 
-    static String issueJwt (String username) {
+    public static String issueJwt (String username) {
         String compactJws = Jwts.builder()
                 .setSubject(username)
                 .claim("refresh_token", false)
@@ -26,7 +26,7 @@ public class JwtService {
         return compactJws;
     }
 
-    static String issueRefreshToken (String username) {
+    public static String issueRefreshToken (String username) {
 
         Date current = new Date();
         Calendar c = Calendar.getInstance();
@@ -46,7 +46,7 @@ public class JwtService {
         return compactJws;
     }
 
-    static boolean verifyJwt (String jwt) {
+    public static boolean verifyJwt (String jwt) {
         try {
             Jwts.parser().setSigningKey(key)
                     .requireIssuer("Refresh Token example authentication server")
