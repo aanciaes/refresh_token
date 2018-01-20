@@ -1,5 +1,6 @@
 package example.refreshtokens.spring;
 
+import example.refreshtokens.apollo.model.User;
 import example.refreshtokens.auth.JwtService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -20,7 +21,7 @@ public class SpringBoot {
     @ResponseBody
     @CrossOrigin("*")
     String home(HttpServletRequest request, HttpServletResponse response) {
-        Cookie c = new Cookie("refresh_token", JwtService.issueRefreshToken("miguel"));
+        Cookie c = new Cookie("refresh_token", JwtService.issueRefreshToken(new User()));
         c.setPath("/");
         c.setDomain("localhost");
         response.addCookie(c);

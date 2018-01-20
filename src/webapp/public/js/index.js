@@ -1,26 +1,26 @@
 $(document).ready(function () {
 
-    var x = 0;
-    if(x===2){
-        alert("x=2");
-        window.location.href = "dashboard.html";
-    }else{
-        alert("x!=2");
-    }
+    ajaxRequest("POST", "http://localhost:1234/verify",
+        function(data, textStatus, xhr){
+            if(xhr.status==200)
+                window.location.href="dashboard.html";
+        },
+        function () {}, true);
 
     $("#login_form").submit(function (event) {
         event.preventDefault();
-
 
         ajaxRequest("POST", "http://localhost:1234/login?username=" + $("#username").val() + "&password=" + $("#password").val()
             , function (data, textStatus, xhr) {
                 if(xhr.status==200)
                     window.location.href="dashboard.html";
-            }, function(data, textStatus, xhr){
-                if(xhr.status==401) {
+            }, function(xhr,textStatus,err){
+                if(xhr.status===401) {
                     $("#login_failed").show();
-                }else
+                }else{
                     console.log(xhr);
+                    $("#login_failed").show();
+                }
             }, true);
     });
 });

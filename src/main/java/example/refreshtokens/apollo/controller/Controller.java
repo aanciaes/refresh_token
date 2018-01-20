@@ -1,23 +1,28 @@
-package example.refreshtokens.apollo;
+package example.refreshtokens.apollo.controller;
 
 import com.spotify.apollo.*;
-import com.spotify.apollo.meta.model.Model;
+import example.refreshtokens.apollo.model.ResponseEntity;
+import example.refreshtokens.apollo.model.User;
+import example.refreshtokens.apollo.service.Service;
 import example.refreshtokens.auth.JwtService;
 
 import java.util.NoSuchElementException;
 
-public class Service {
+public class Controller {
+
+    private static Service service = new Service ();
 
     static Response<ResponseEntity> login (RequestContext requestContext) {
-        System.out.println("Payload: " + requestContext.request().payload().get().utf8());
         String username = requestContext.request().parameter("username").get();
         String password = requestContext.request().parameter("password").get();
 
-        if(username.equals("miguel") && password.equals("password")){
+        User user = service.login(username, password);
+
+        if(user!=null){
             return Response.forPayload(new ResponseEntity("Login Successful", 200))
                     .withHeader("Access-Control-Allow-Origin", "http://localhost:63342")
                     .withHeader("Access-Control-Allow-Credentials", "true")
-                    .withHeader("Set-Cookie", "refresh-token=" + JwtService.issueRefreshToken(username)
+                    .withHeader("Set-Cookie", "refresh-token=" + JwtService.issueRefreshToken(user)
                     + "; Domain=localhost; Path=/; HttpOnly");
         }
         else {
@@ -33,7 +38,7 @@ public class Service {
             String refreshToken = getRefreshTokenFromCookies(request.request().header("cookie").get());
             boolean isValid = JwtService.verifyRefreshToken(refreshToken);
 
-            return Response.forPayload(new ResponseEntity("Token is valid: " + isValid,
+            return Response.forStatus(isValid ? Status.OK : Status.UNAUTHORIZED).withPayload(new ResponseEntity("Token is valid: " + isValid,
                     isValid ? 200 : 401))
                     .withHeader("Access-Control-Allow-Origin", "http://localhost:63342")
                     .withHeader("Access-Control-Allow-Credentials", "true");

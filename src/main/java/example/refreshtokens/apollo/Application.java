@@ -3,6 +3,7 @@ package example.refreshtokens.apollo;
 import com.spotify.apollo.Environment;
 import com.spotify.apollo.httpservice.HttpService;
 import com.spotify.apollo.httpservice.LoadingException;
+import example.refreshtokens.apollo.controller.Routes;
 
 public class Application {
 

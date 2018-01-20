@@ -1,5 +1,6 @@
 package example.refreshtokens.auth;
 
+import example.refreshtokens.apollo.model.User;
 import io.jsonwebtoken.*;
 
 import java.util.Calendar;
@@ -23,8 +24,7 @@ public class JwtService {
         return compactJws;
     }
 
-    public static String issueRefreshToken (String username) {
-
+    public static String issueRefreshToken (User user) {
         Date current = new Date();
         Calendar c = Calendar.getInstance();
         c.setTime(current);
@@ -32,19 +32,24 @@ public class JwtService {
         Date expirationDate = c.getTime();
 
         String compactJws = Jwts.builder()
-                .setSubject(username)
+                .setSubject(user.getUsername())
                 .claim("refresh_token", true)
-                .claim("admin", true)
+                .claim("userId", user.getId())
+                .claim("admin", user.isAdmin())
                 .setIssuedAt(current)
                 .setExpiration(setExpirationDate(true))
                 .setIssuer("Refresh Token example authentication server")
                 .signWith(SignatureAlgorithm.HS512, refreshToken_key)
                 .compact();
+
         return compactJws;
     }
 
     public static boolean verifyRefreshToken (String refreshToken) {
         try {
+            if(refreshToken==null || refreshToken.equals(""))
+                return false;
+
             Jwts.parser().setSigningKey(refreshToken_key)
                     .require("refresh_token", true)
                     .requireIssuer("Refresh Token example authentication server")
