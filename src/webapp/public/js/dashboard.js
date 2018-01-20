@@ -1,7 +1,6 @@
 $(document).ready(function () {
 
     $("#user_details").click(function () {
-        alert("clicked");
         ajaxRequest("POST", "http://localhost:1234/verify", function (data) {
             alert(data)
         }, true);

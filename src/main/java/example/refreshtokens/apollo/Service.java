@@ -1,7 +1,7 @@
 package example.refreshtokens.apollo;
 
-import com.spotify.apollo.RequestContext;
-import com.spotify.apollo.Response;
+import com.spotify.apollo.*;
+import com.spotify.apollo.meta.model.Model;
 import example.refreshtokens.auth.JwtService;
 
 import java.util.NoSuchElementException;
@@ -21,8 +21,10 @@ public class Service {
                     + "; Domain=localhost; Path=/; HttpOnly");
         }
         else {
-            return Response.forPayload(new ResponseEntity("Login Failed", 401))
-                    .withHeader("Access-Control-Allow-Origin", "http://localhost:63342");
+            return Response.forStatus(Status.UNAUTHORIZED.withReasonPhrase("Login Failed"))
+                    .withPayload(new ResponseEntity("Login Failed", 401))
+                    .withHeader("Access-Control-Allow-Origin", "http://localhost:63342")
+                    .withHeader("Access-Control-Allow-Credentials", "true");
         }
     }
 
