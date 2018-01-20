@@ -2,6 +2,9 @@ package example.refreshtokens.apollo.service;
 
 import example.refreshtokens.apollo.model.User;
 import example.refreshtokens.apollo.model.UserRepository;
+import example.refreshtokens.auth.JwtService;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 
 public class Service {
 
@@ -19,5 +22,18 @@ public class Service {
         }else {
             return null;
         }
+    }
+
+    public User getUser (String refreshToken) {
+        Jws<Claims> jws = JwtService.getJwtFromRefreshToken(refreshToken);
+        if(jws==null)
+            return null;
+
+        int userId = jws.getBody().get("userId", Integer.class);
+
+        User user = userRepository.getUserById(userId);
+        if(user==null)
+            return null;
+        return user;
     }
 }

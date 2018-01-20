@@ -81,6 +81,21 @@ public class JwtService {
         }
     }
 
+    public static Jws<Claims> getJwtFromRefreshToken (String refreshToken) {
+        try {
+            return Jwts.parser().setSigningKey(refreshToken_key)
+                    .require("refresh_token", true)
+                    .requireIssuer("Refresh Token example authentication server")
+                    .parseClaimsJws(refreshToken);
+        }catch (ExpiredJwtException e){
+            System.out.println("JWT has expired");
+            return null;
+        } catch (SignatureException e) {
+            System.out.println("Signature Exception");
+            return null;
+        }
+    }
+
     private static Date setExpirationDate (boolean refreshToken) {
         Date current = new Date();
         Calendar c = Calendar.getInstance();

@@ -13,7 +13,8 @@ public class Routes implements RouteProvider {
         return Stream.of(
                 Route.sync("POST", "/login", Controller::login),
                 Route.sync("POST", "/verify", Controller::verifyRefreshToken),
-                Route.sync("GET", "/user", Controller::getUserDetails)
+                Route.sync("GET", "/user", Controller::getUserDetails),
+                Route.sync("POST", "/logout", Controller::logout)
         );
     }
 }

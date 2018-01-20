@@ -49,7 +49,7 @@ public class Controller {
         }
     }
 
-    static Response<ResponseEntity> getUserDetails (RequestContext request) {
+    static Response getUserDetails (RequestContext request) {
         String refresh_token = getRefreshTokenFromCookies((request.request().header("cookie").get()));
 
         if (refresh_token==null){
@@ -58,10 +58,25 @@ public class Controller {
                     .withHeader("Access-Control-Allow-Origin", "http://localhost:63342")
                     .withHeader("Access-Control-Allow-Credentials", "true");
         } else {
-            return Response.ok().withPayload(new ResponseEntity("Hello", 200))
+            User user = service.getUser(refresh_token);
+            if(user != null){
+                return Response.forPayload(user)
+                        .withHeader("Access-Control-Allow-Origin", "http://localhost:63342")
+                        .withHeader("Access-Control-Allow-Credentials", "true");
+            }
+
+            return Response.forStatus(Status.FORBIDDEN)
+                    .withPayload(new ResponseEntity("Something went wrong", 403))
                     .withHeader("Access-Control-Allow-Origin", "http://localhost:63342")
                     .withHeader("Access-Control-Allow-Credentials", "true");
         }
+    }
+
+    static Response<ResponseEntity> logout (RequestContext request) {
+        return Response.ok().withPayload(new ResponseEntity("You have been logged out", 200))
+                .withHeader("Access-Control-Allow-Origin", "http://localhost:63342")
+                .withHeader("Access-Control-Allow-Credentials", "true")
+                .withHeader("Set-Cookie", "refresh-token=null; Max-Age=-1");
     }
 
     private static String getRefreshTokenFromCookies (String allCookies) {
@@ -69,7 +84,8 @@ public class Controller {
 
         for (int i=0; i<splited.length; i++) {
             if (splited[i].equals("refresh-token")) {
-                return splited[i + 1];
+                if(splited[i+1]!=null)
+                    return splited[i + 1];
             }
         }
         return null;

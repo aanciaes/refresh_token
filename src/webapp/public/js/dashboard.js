@@ -1,24 +1,30 @@
 $(document).ready(function () {
 
     ajaxRequest("GET", "http://localhost:1234/user", function (data) {
-        alert(data);
+        buildUserDetails(data);
     }, function (xhr, textStatus) {
         if(xhr.status===401){
             window.location.href = "index.html";
         }
     }, true);
 
-
-    $("#user_details").click(function () {
-        ajaxRequest("POST", "http://localhost:1234/verify", function (data) {
-            alert(data)
-        },
-        function (xhr,textStatus,err) {
-            console.log(xhr)
-        }, true);
+    $("#logout_btn").click(function () {
+        ajaxRequest("POST", "http://localhost:1234/logout", function (data) {
+            alert(data);
+        }, function (xhr) {
+                alert(xhr)
+            }, true);
     });
 
 });
+
+function buildUserDetails (httpResponse) {
+    var user = JSON.parse(httpResponse);
+
+    $("#username").append("Username: " + user.username);
+    $("#isAdmin").append("Is administrator: " + user.admin);
+
+}
 
 //Generic ajax request function
 function ajaxRequest(type, url, success, error, credentials) {
