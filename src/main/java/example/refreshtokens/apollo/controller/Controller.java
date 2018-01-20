@@ -49,6 +49,21 @@ public class Controller {
         }
     }
 
+    static Response<ResponseEntity> getUserDetails (RequestContext request) {
+        String refresh_token = getRefreshTokenFromCookies((request.request().header("cookie").get()));
+
+        if (refresh_token==null){
+            return Response.forStatus(Status.UNAUTHORIZED)
+                    .withPayload(new ResponseEntity("Unauthorized", 401))
+                    .withHeader("Access-Control-Allow-Origin", "http://localhost:63342")
+                    .withHeader("Access-Control-Allow-Credentials", "true");
+        } else {
+            return Response.ok().withPayload(new ResponseEntity("Hello", 200))
+                    .withHeader("Access-Control-Allow-Origin", "http://localhost:63342")
+                    .withHeader("Access-Control-Allow-Credentials", "true");
+        }
+    }
+
     private static String getRefreshTokenFromCookies (String allCookies) {
         String [] splited = allCookies.split("\\s|=|;");
 
@@ -57,6 +72,6 @@ public class Controller {
                 return splited[i + 1];
             }
         }
-        return new String ();
+        return null;
     }
 }

@@ -9,9 +9,10 @@ public class UserRepository {
     private List<User> database;
 
     public UserRepository () {
-        System.out.println("Init on user repo");
         this.counter=0;
         this.database = new ArrayList<>();
+
+        //Bootstraping a few users
         insertUser("miguel", "miguelpassword", true);
         insertUser("joao", "joaopassword", false);
     }
@@ -22,7 +23,7 @@ public class UserRepository {
         return user;
     }
 
-    public User getUser (int id) {
+    public User getUserById (int id) {
         return database.get(id);
     }
 

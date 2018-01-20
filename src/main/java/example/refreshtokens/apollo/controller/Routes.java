@@ -12,7 +12,8 @@ public class Routes implements RouteProvider {
     public Stream<? extends Route<? extends AsyncHandler<?>>> routes() {
         return Stream.of(
                 Route.sync("POST", "/login", Controller::login),
-                Route.sync("POST", "/verify", Controller::verifyRefreshToken)
+                Route.sync("POST", "/verify", Controller::verifyRefreshToken),
+                Route.sync("GET", "/user", Controller::getUserDetails)
         );
     }
 }
