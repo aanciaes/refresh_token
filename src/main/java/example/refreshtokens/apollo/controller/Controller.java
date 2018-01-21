@@ -64,9 +64,8 @@ public class Controller {
                         .withHeader("Access-Control-Allow-Origin", "http://localhost:63342")
                         .withHeader("Access-Control-Allow-Credentials", "true");
             }
-
-            return Response.forStatus(Status.FORBIDDEN)
-                    .withPayload(new ResponseEntity("Something went wrong", 403))
+            return Response.forStatus(Status.FORBIDDEN.withReasonPhrase("Session Expired"))
+                    .withPayload(new ResponseEntity("Session Expired", 403))
                     .withHeader("Access-Control-Allow-Origin", "http://localhost:63342")
                     .withHeader("Access-Control-Allow-Credentials", "true");
         }

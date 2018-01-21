@@ -6,11 +6,12 @@ $(document).ready(function () {
      * and redirects to dashboard page
      */
     ajaxRequest("POST", "http://localhost:1234/verify",
-        function(data, textStatus, xhr){
-            if(xhr.status==200)
-                window.location.href="dashboard.html";
+        function (data, textStatus, xhr) {
+            if (xhr.status == 200)
+                window.location.href = "dashboard.html";
         },
-        function () {}, true);
+        function () {
+        }, true);
     //
 
     $("#login_form").submit(function (event) {
@@ -18,14 +19,20 @@ $(document).ready(function () {
 
         ajaxRequest("POST", "http://localhost:1234/login?username=" + $("#username").val() + "&password=" + $("#password").val()
             , function (data, textStatus, xhr) {
-                if(xhr.status==200)
-                    window.location.href="dashboard.html";
-            }, function(xhr,textStatus,err){
-                if(xhr.status===401) {
+                if (xhr.status == 200)
+                    window.location.href = "dashboard.html";
+
+            }, function (xhr, textStatus, err) {
+
+                if (xhr.status === 401) {
                     $("#login_failed").show();
-                }else{
+                    $("#username").val('');
+                    $("#password").val('');
+                } else {
                     console.log(xhr);
                     $("#login_failed").show();
+                    $("#username").val('');
+                    $("#password").val('');
                 }
             }, true);
     });

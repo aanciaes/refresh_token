@@ -25,19 +25,14 @@ public class JwtService {
     }
 
     public static String issueRefreshToken (User user) {
-        Date current = new Date();
-        Calendar c = Calendar.getInstance();
-        c.setTime(current);
-        c.add(Calendar.WEEK_OF_MONTH, 1);
-        Date expirationDate = c.getTime();
 
         String compactJws = Jwts.builder()
                 .setSubject(user.getUsername())
                 .claim("refresh_token", true)
                 .claim("userId", user.getId())
                 .claim("admin", user.isAdmin())
-                .setIssuedAt(current)
-                .setExpiration(setExpirationDate(true))
+                .setIssuedAt(new Date())
+                .setExpiration(setExpirationDate(false))
                 .setIssuer("Refresh Token example authentication server")
                 .signWith(SignatureAlgorithm.HS512, refreshToken_key)
                 .compact();

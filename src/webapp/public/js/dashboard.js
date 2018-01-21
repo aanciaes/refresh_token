@@ -6,13 +6,18 @@ $(document).ready(function () {
         if(xhr.status===401){
             window.location.href = "index.html";
         }
+        if(xhr.status===403){
+            alert("Session has expired");
+            window.location.href = "index.html";
+        }
     }, true);
 
     $("#logout_btn").click(function () {
-        ajaxRequest("POST", "http://localhost:1234/logout", function (data) {
-            alert(data);
-        }, function (xhr) {
-                alert(xhr)
+        ajaxRequest("POST", "http://localhost:1234/logout",
+            function (data) {
+                window.location.href="index.html";
+            }, function (xhr) {
+                console.log(xhr);
             }, true);
     });
 
@@ -23,7 +28,6 @@ function buildUserDetails (httpResponse) {
 
     $("#username").append("Username: " + user.username);
     $("#isAdmin").append("Is administrator: " + user.admin);
-
 }
 
 //Generic ajax request function
