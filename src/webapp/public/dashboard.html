@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>RefreshToken Example Dashboard</title>
+        <script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script type="application/javascript" src ="js/dashboard.js"></script>
+    </head>
+    <body>
+        <div id="container">
+            <div id="user_details">
+                <div id="headline">
+                    <h1 id="username"></h1>
+                </div>
+                <div id="permissions">
+                    <h3 id="isAdmin"></h3>
+                </div>
+            </div>
+            <div id="operations">
+                <button id="non_admin">Non Admin Operation</button>
+                <br>
+                <button id="admin">Admin Operation</button>
+            </div>
+            <div id="operationResult-div">
+                <p id="operation-result" style="color:red" hidden></p>
+            </div>
+            <br>
+            <div id="logout">
+                <button id="logout_btn">Logout</button>
+            </div>
+        </div>
+    </body>
+</html>
