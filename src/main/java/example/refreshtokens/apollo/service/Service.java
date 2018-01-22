@@ -25,7 +25,7 @@ public class Service {
     }
 
     public User getUser(String refreshToken) {
-        Jws<Claims> jws = JwtService.getJwtFromRefreshToken(refreshToken);
+        Jws<Claims> jws = JwtService.decodeRefreshToken(refreshToken);
         if (jws == null)
             return null;
 
@@ -54,7 +54,34 @@ public class Service {
     }
 
     public boolean accessAdminResource (String authorization) {
-        //TODO: verify authorization: Bearer and get results
-        return true;
+        if(authorization.contains("Bearer")) {
+            String token = authorization.split("\\s+")[1];
+            Jws<Claims> claims = JwtService.decodeJwt(token);
+
+            if (claims != null) {
+                if (claims.getBody().get("resource").equals("ADMIN_RESOURCE")) {
+                    User user = userRepository.getUserById(claims.getBody().get("userId", Integer.class));
+                    if (user != null)
+                        return user.isAdmin();
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean accessNonAdminResource (String authorization) {
+        if(authorization.contains("Bearer")) {
+            String token = authorization.split("\\s+")[1];
+            Jws<Claims> claims = JwtService.decodeJwt(token);
+
+            if (claims != null) {
+                if (claims.getBody().get("resource").equals("NON_ADMIN_RESOURCE")) {
+                    User user = userRepository.getUserById(claims.getBody().get("userId", Integer.class));
+                    if (user != null)
+                        return true;
+                }
+            }
+        }
+        return false;
     }
 }

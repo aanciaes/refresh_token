@@ -12,6 +12,7 @@ $(document).ready(function () {
     }, true);
 
     $("#admin").click(adminOperation);
+    $("#non_admin").click(nonAdminOperation);
 
     $("#logout_btn").click(function () {
         ajaxRequest("POST", "http://localhost:1234/logout", null,
@@ -38,8 +39,8 @@ function adminOperation(){
             getAdminResource(obj.accessToken, obj.type);
         },
         function (xhr) {
-            console.log(xhr);
-            window.location.href="index.html"
+            if(xhr.status===401)
+                window.location.href="index.html"
         }, true);
 }
 
@@ -49,10 +50,43 @@ function getAdminResource (accessToken, type){
     };
     ajaxRequest("GET", "http://localhost:1234/admin", headers,
         function (data) {
-            alert(data);
+            $("#operation-result").text("You have access an admin only resource").show();
         },
         function (xhr) {
-            alert(xhr);
+            if(xhr.status===403){
+                $("#operation-result").text("You do not have permission to access this resource").show();
+            }else{
+                window.location.href = "index.html";
+            }
+        }, true)
+}
+
+function nonAdminOperation () {
+    ajaxRequest("GET", "http://localhost:1234/refresh?resource=NON_ADMIN_RESOURCE", null,
+        function (data) {
+            var obj = JSON.parse(data);
+            getNonAdminResource(obj.accessToken, obj.type);
+        },
+        function (xhr) {
+            if(xhr.status===401)
+                window.location.href="index.html"
+        }, true);
+}
+
+function getNonAdminResource (accessToken, type){
+    var headers = {
+        "Authorization" : type + " " + accessToken
+    };
+    ajaxRequest("GET", "http://localhost:1234/nonAdmin", headers,
+        function (data) {
+            $("#operation-result").text("You have access normal a resource").show();
+        },
+        function (xhr) {
+            if(xhr.status===403){
+                $("#operation-result").text("You do not have permission to access this resource").show();
+            }else{
+                window.location.href = "index.html";
+            }
         }, true)
 }
 

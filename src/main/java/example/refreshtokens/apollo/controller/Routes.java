@@ -17,6 +17,8 @@ public class Routes implements RouteProvider {
                 Route.sync("GET", "/refresh", Controller::getAccessToken),
                 Route.sync("GET", "/admin", Controller::adminOperation),
                 Route.sync("OPTIONS", "/admin", Controller::adminOperation),
+                Route.sync("GET", "/nonAdmin", Controller::nonAdminOperation),
+                Route.sync("OPTIONS", "/nonAdmin", Controller::nonAdminOperation),
                 Route.sync("POST", "/logout", Controller::logout)
         );
     }

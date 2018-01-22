@@ -16,6 +16,7 @@ public class JwtService {
         String compactJws = Jwts.builder()
                 .setSubject(user.getUsername())
                 .claim("refresh_token", false)
+                .claim("userId", user.getId())
                 .claim("admin", user.isAdmin())
                 .claim("resource", resource)
                 .setExpiration(setExpirationDate(false))
@@ -62,23 +63,22 @@ public class JwtService {
         }
     }
 
-    public static boolean verifyJwt (String jwt) {
+    public static Jws decodeJwt (String jwt) {
         try {
-            Jwts.parser().setSigningKey(key)
+            return Jwts.parser().setSigningKey(key)
                     .requireIssuer("Refresh Token example authentication server")
                     .parseClaimsJws(jwt);
-            return true;
 
         }catch (ExpiredJwtException e){
             System.out.println("JWT has expired");
-            return false;
+            return null;
         } catch (SignatureException e) {
             System.out.println("Signature Exception");
-            return false;
+            return null;
         }
     }
 
-    public static Jws<Claims> getJwtFromRefreshToken (String refreshToken) {
+    public static Jws<Claims> decodeRefreshToken (String refreshToken) {
         try {
             return Jwts.parser().setSigningKey(refreshToken_key)
                     .require("refresh_token", true)

@@ -22,17 +22,13 @@ public class Controller {
         User user = service.login(username, password);
 
         if(user!=null){
-            return Response.forPayload(new ResponseEntity("Login Successful", 200))
-                    .withHeader("Access-Control-Allow-Origin", FRONT_END_SERVER)
-                    .withHeader("Access-Control-Allow-Credentials", "true")
+            return addCorsFilter(Response.forPayload(new ResponseEntity("Login Successful", 200))
                     .withHeader("Set-Cookie", "refresh-token=" + JwtService.issueRefreshToken(user)
-                    + "; Domain=localhost; Path=/; HttpOnly");
+                    + "; Domain=localhost; Path=/; HttpOnly"));
         }
         else {
-            return Response.forStatus(Status.UNAUTHORIZED.withReasonPhrase("Login Failed"))
-                    .withPayload(new ResponseEntity("Login Failed", 401))
-                    .withHeader("Access-Control-Allow-Origin", FRONT_END_SERVER)
-                    .withHeader("Access-Control-Allow-Credentials", "true");
+            return addCorsFilter(Response.forStatus(Status.UNAUTHORIZED.withReasonPhrase("Login Failed"))
+                    .withPayload(new ResponseEntity("Login Failed", 401)));
         }
     }
 
@@ -41,14 +37,10 @@ public class Controller {
             String refreshToken = getRefreshTokenFromCookies(request.request().header("cookie").get());
             boolean isValid = JwtService.verifyRefreshToken(refreshToken);
 
-            return Response.forStatus(isValid ? Status.OK : Status.UNAUTHORIZED).withPayload(new ResponseEntity("Token is valid: " + isValid,
-                    isValid ? 200 : 401))
-                    .withHeader("Access-Control-Allow-Origin", FRONT_END_SERVER)
-                    .withHeader("Access-Control-Allow-Credentials", "true");
+            return addCorsFilter(Response.forStatus(isValid ? Status.OK : Status.UNAUTHORIZED).withPayload(new ResponseEntity("Token is valid: " + isValid,
+                    isValid ? 200 : 401)));
         }catch (NoSuchElementException e){
-            return Response.forPayload(new ResponseEntity("No Such Element Exception",500))
-                    .withHeader("Access-Control-Allow-Origin", FRONT_END_SERVER)
-                    .withHeader("Access-Control-Allow-Credentials", "true");
+            return addCorsFilter(Response.forPayload(new ResponseEntity("No Such Element Exception",500)));
         }
     }
 
@@ -56,21 +48,15 @@ public class Controller {
         String refresh_token = getRefreshTokenFromCookies((request.request().header("cookie").get()));
 
         if (refresh_token==null){
-            return Response.forStatus(Status.UNAUTHORIZED)
-                    .withPayload(new ResponseEntity("Unauthorized", 401))
-                    .withHeader("Access-Control-Allow-Origin", FRONT_END_SERVER)
-                    .withHeader("Access-Control-Allow-Credentials", "true");
+            return addCorsFilter(Response.forStatus(Status.UNAUTHORIZED)
+                    .withPayload(new ResponseEntity("Unauthorized", 401)));
         } else {
             User user = service.getUser(refresh_token);
             if(user != null){
-                return Response.forPayload(user)
-                        .withHeader("Access-Control-Allow-Origin", FRONT_END_SERVER)
-                        .withHeader("Access-Control-Allow-Credentials", "true");
+                return addCorsFilter(Response.forPayload(user));
             }
-            return Response.forStatus(Status.FORBIDDEN.withReasonPhrase("Session Expired"))
-                    .withPayload(new ResponseEntity("Session Expired", 403))
-                    .withHeader("Access-Control-Allow-Origin", FRONT_END_SERVER)
-                    .withHeader("Access-Control-Allow-Credentials", "true");
+            return addCorsFilter(Response.forStatus(Status.FORBIDDEN.withReasonPhrase("Session Expired"))
+                    .withPayload(new ResponseEntity("Session Expired", 403)));
         }
     }
 
@@ -81,49 +67,45 @@ public class Controller {
         String accessToken = service.getAccessToken (refresh_token, resource);
 
         if(accessToken!=null){
-            return Response.forPayload(new AccessToken(accessToken, "Bearer"))
-                    .withHeader("Access-Control-Allow-Origin", FRONT_END_SERVER)
-                    .withHeader("Access-Control-Allow-Credentials", "true");
+            return addCorsFilter(Response.forPayload(new AccessToken(accessToken, "Bearer")));
         }else{
-            return Response.forStatus(Status.FORBIDDEN.withReasonPhrase("Refresh Token is not valid"))
-                    .withHeader("Access-Control-Allow-Origin", FRONT_END_SERVER)
-                    .withHeader("Access-Control-Allow-Credentials", "true");
+            return addCorsFilter(Response.forStatus(Status.UNAUTHORIZED.withReasonPhrase("Refresh Token is not valid")));
         }
     }
 
     static Response adminOperation (RequestContext request) {
         //handle preflight options request made by ajax
         if(request.request().method().equals("OPTIONS")) {
-            return Response.ok()
-                    .withHeader("Access-Control-Allow-Origin", FRONT_END_SERVER)
-                    .withHeader("Access-Control-Allow-Headers", "Authorization")
-                    .withHeader("Access-Control-Allow-Credentials", "true");
+            return addCorsFilter(Response.ok()
+                    .withHeader("Access-Control-Allow-Headers", "Authorization"));
         }
+
         if(service.accessAdminResource (request.request().header("Authorization").get())){
-            return Response.forStatus(Status.OK)
-                    .withHeader("Access-Control-Allow-Origin", FRONT_END_SERVER)
-                    .withHeader("Access-Control-Allow-Headers", "*")
-                    .withHeader("Access-Control-Allow-Credentials", "true");
+            return addCorsFilter(Response.forStatus(Status.OK));
         } else{
-            return Response.forStatus(Status.FORBIDDEN)
-                    .withHeader("Access-Control-Allow-Origin", FRONT_END_SERVER)
-                    .withHeader("Access-Control-Allow-Headers", "*")
-                    .withHeader("Access-Control-Allow-Credentials", "true");
+            return addCorsFilter(Response.forStatus(Status.FORBIDDEN
+                    .withReasonPhrase("You do not have permissions to access this resource")));
         }
     }
 
     static Response nonAdminOperation (RequestContext request) {
-        //TODO: finish
-        return Response.ok().withHeader("Access-Control-Allow-Origin", FRONT_END_SERVER)
-                .withHeader("Access-Control-Allow-Headers", "Authorization")
-                .withHeader("Access-Control-Allow-Credentials", "true");
+        //handle preflight options request made by ajax
+        if(request.request().method().equals("OPTIONS")) {
+            return addCorsFilter(Response.ok()
+                    .withHeader("Access-Control-Allow-Headers", "Authorization"));
+        }
+
+        if(service.accessNonAdminResource (request.request().header("Authorization").get())){
+            return addCorsFilter(Response.forStatus(Status.OK));
+        } else{
+            return addCorsFilter(Response.forStatus(Status.FORBIDDEN
+                    .withReasonPhrase("You do not have permissions to access this resource")));
+        }
     }
 
     static Response<ResponseEntity> logout (RequestContext request) {
-        return Response.ok().withPayload(new ResponseEntity("You have been logged out", 200))
-                .withHeader("Access-Control-Allow-Origin", FRONT_END_SERVER)
-                .withHeader("Access-Control-Allow-Credentials", "true")
-                .withHeader("Set-Cookie", "refresh-token=null; Max-Age=-1");
+        return addCorsFilter(Response.ok().withPayload(new ResponseEntity("You have been logged out", 200))
+                .withHeader("Set-Cookie", "refresh-token=null; Max-Age=-1"));
     }
 
     private static String getRefreshTokenFromCookies (String allCookies) {
@@ -136,5 +118,11 @@ public class Controller {
             }
         }
         return null;
+    }
+
+    private static Response addCorsFilter (Response response){
+        return response
+                .withHeader("Access-Control-Allow-Origin", FRONT_END_SERVER)
+                .withHeader("Access-Control-Allow-Credentials", "true");
     }
 }
