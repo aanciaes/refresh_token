@@ -11,11 +11,13 @@ public class JwtService {
     private static final String key = "supersecurekey";
     private static final String refreshToken_key = "ev3nMoreS3cureK3yThanTheOtherOne!";
 
-    public static String issueJwt (String username) {
+    public static String issueJwt (User user, String resource) {
+
         String compactJws = Jwts.builder()
-                .setSubject(username)
+                .setSubject(user.getUsername())
                 .claim("refresh_token", false)
-                .claim("claimExample", "hello")
+                .claim("admin", user.isAdmin())
+                .claim("resource", resource)
                 .setExpiration(setExpirationDate(false))
                 .setIssuer("Refresh Token example authentication server")
                 .signWith(SignatureAlgorithm.HS256, key)

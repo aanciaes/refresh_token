@@ -1,19 +1,20 @@
 $(document).ready(function () {
 
-    ajaxRequest("GET", "http://localhost:1234/user", function (data) {
+    ajaxRequest("GET", "http://localhost:1234/user", null,  function (data) {
         buildUserDetails(data);
     }, function (xhr, textStatus) {
         if(xhr.status===401){
             window.location.href = "index.html";
         }
         if(xhr.status===403){
-            alert("Session has expired");
             window.location.href = "index.html";
         }
     }, true);
 
+    $("#admin").click(adminOperation);
+
     $("#logout_btn").click(function () {
-        ajaxRequest("POST", "http://localhost:1234/logout",
+        ajaxRequest("POST", "http://localhost:1234/logout", null,
             function (data) {
                 window.location.href="index.html";
             }, function (xhr) {
@@ -30,8 +31,33 @@ function buildUserDetails (httpResponse) {
     $("#isAdmin").append("Is administrator: " + user.admin);
 }
 
+function adminOperation(){
+    ajaxRequest("GET", "http://localhost:1234/refresh?resource=ADMIN_RESOURCE", null,
+        function (data) {
+            var obj = JSON.parse(data);
+            getAdminResource(obj.accessToken, obj.type);
+        },
+        function (xhr) {
+            console.log(xhr);
+            window.location.href="index.html"
+        }, true);
+}
+
+function getAdminResource (accessToken, type){
+    var headers = {
+        "Authorization" : type + " " + accessToken
+    };
+    ajaxRequest("GET", "http://localhost:1234/admin", headers,
+        function (data) {
+            alert(data);
+        },
+        function (xhr) {
+            alert(xhr);
+        }, true)
+}
+
 //Generic ajax request function
-function ajaxRequest(type, url, success, error, credentials) {
+function ajaxRequest(type, url, headers, success, error, credentials) {
     var params = {
         type: type,
         url: url,
@@ -42,6 +68,8 @@ function ajaxRequest(type, url, success, error, credentials) {
 
     if (credentials)
         params.xhrFields = {withCredentials: true};
+    if(headers!=null)
+        params.headers = headers;
 
     $.ajax(params);
 }

@@ -10,30 +10,51 @@ public class Service {
 
     private UserRepository userRepository = new UserRepository();
 
-    public User login (String username, String password) {
+    public User login(String username, String password) {
         User user = userRepository.getUserByUsername(username);
 
-        if(user!=null){
-            if(user.getHashedPassword().equals(password))
+        if (user != null) {
+            if (user.getHashedPassword().equals(password))
                 return user;
             else {
                 return null;
             }
-        }else {
+        } else {
             return null;
         }
     }
 
-    public User getUser (String refreshToken) {
+    public User getUser(String refreshToken) {
         Jws<Claims> jws = JwtService.getJwtFromRefreshToken(refreshToken);
-        if(jws==null)
+        if (jws == null)
             return null;
 
         int userId = jws.getBody().get("userId", Integer.class);
 
         User user = userRepository.getUserById(userId);
-        if(user==null)
+        if (user == null)
             return null;
         return user;
+    }
+
+    public String getAccessToken(String refreshToken, String resource) {
+        User user = getUser(refreshToken);
+
+        if(user == null)
+            return null;
+
+        switch (resource) {
+            case "ADMIN_RESOURCE":
+                if (user.isAdmin()) {
+                    return JwtService.issueJwt(user, resource);
+                }
+            default:
+                return JwtService.issueJwt(user, resource);
+        }
+    }
+
+    public boolean accessAdminResource (String authorization) {
+        //TODO: verify authorization: Bearer and get results
+        return true;
     }
 }
