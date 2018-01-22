@@ -2,7 +2,7 @@ package example.refreshtokens.apollo
 
 import com.spotify.apollo.*
 import com.spotify.apollo.httpservice.HttpService
-import example.refreshtokens.apollo.controller.Routes
+import example.refreshtokens.apollo.controller.RoutesKt
 
 object ApplicationKotlin {
 
@@ -13,7 +13,7 @@ object ApplicationKotlin {
 
     fun init(environment: Environment) {
         environment.routingEngine()
-                .registerAutoRoutes(Routes())
+                .registerAutoRoutes(RoutesKt())
     }
 }
 

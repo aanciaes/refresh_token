@@ -2,10 +2,10 @@ package example.refreshtokens.apollo.controller;
 
 import com.spotify.apollo.*;
 import example.refreshtokens.apollo.model.AccessToken;
+import example.refreshtokens.auth.JwtService;
 import example.refreshtokens.apollo.model.ResponseEntity;
 import example.refreshtokens.apollo.model.User;
 import example.refreshtokens.apollo.service.Service;
-import example.refreshtokens.auth.JwtService;
 
 import java.util.NoSuchElementException;
 

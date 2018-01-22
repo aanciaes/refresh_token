@@ -1,29 +1,31 @@
 package example.refreshtokens.auth
 
-import example.refreshtokens.apollo.model.User
+import example.refreshtokens.apollo.model.UserKt
 import io.jsonwebtoken.*
 import org.apache.commons.lang.time.DateUtils
 
 import java.util.Date
 
-object JWTService {
+object JwtServiceKt {
 
     private val key = "supersecurekey"
     private val refreshToken_key = "ev3nMoreS3cureK3yThanTheOtherOne!"
 
-    fun issueJwt(username: String): String {
+    fun issueJwt(user: UserKt, resource: String): String {
 
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject(user.username)
                 .claim("refresh_token", false)
-                .claim("claimExample", "hello")
+                .claim("userId", user.id)
+                .claim("admin", user.isAdmin)
+                .claim("resource", resource)
                 .setExpiration(setExpirationDate(false))
                 .setIssuer("Refresh Token example authentication server")
                 .signWith(SignatureAlgorithm.HS256, key)
                 .compact()
     }
 
-    fun issueRefreshToken(user: User): String {
+    fun issueRefreshToken(user: UserKt): String {
 
         return Jwts.builder()
                 .setSubject(user.username)
@@ -57,29 +59,27 @@ object JWTService {
         }
     }
 
-    fun verifyJwt(jwt: String): Boolean {
+    fun decodeJwt(jwt: String?): Jws<Claims>? {
         try {
-            Jwts.parser().setSigningKey(key)
+            return Jwts.parser().setSigningKey(key)
                     .requireIssuer("Refresh Token example authentication server")
                     .parseClaimsJws(jwt)
-            return true
 
         } catch (e: ExpiredJwtException) {
             println("JWT has expired")
-            return false
+            return null
         } catch (e: SignatureException) {
             println("Signature Exception")
-            return false
+            return null
         }
     }
 
-    fun getJwtFromRefreshToken(refreshToken: String): Jws<Claims>? {
+    fun decodeRefreshToken(refreshToken: String?): Jws<Claims>? {
         try {
             return Jwts.parser().setSigningKey(refreshToken_key)
                     .require("refresh_token", true)
                     .requireIssuer("Refresh Token example authentication server")
                     .parseClaimsJws(refreshToken)
-
         } catch (e: ExpiredJwtException) {
             println("JWT has expired")
             return null
@@ -87,19 +87,9 @@ object JWTService {
             println("Signature Exception")
             return null
         }
-
     }
 
     private fun setExpirationDate(refreshToken: Boolean): Date {
-        /*val current = Date()
-        val c = Calendar.getInstance()
-        c.time = current
-        if (refreshToken) {
-            c.add(Calendar.WEEK_OF_MONTH, 1)
-        } else {
-            c.add(Calendar.SECOND, 60)
-        }
-        return c.time*/
         return if (refreshToken) DateUtils.addWeeks(Date(), 1)
         else DateUtils.addSeconds(Date(), 60)
     }
